@@ -1,7 +1,7 @@
-# Ignorar los archivos de datos, excepto los metadatos de DVC
-/data/*
+# Permitir versionar los datos anonimizados y los metadatos de DVC
+!/data/
+!/data/*.csv
 !/data/*.csv.dvc
-/data/*.csv
 
 # Credenciales y configuraciones locales
 .env
