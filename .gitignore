@@ -1,8 +1,7 @@
-# Datos gestionados mediante DVC
-data/
-
-# No subir archivos CSV directamente a GitHub
-*.csv
+# Ignorar los archivos de datos, excepto los metadatos de DVC
+/data/*
+!/data/*.csv.dvc
+/data/*.csv
 
 # Credenciales y configuraciones locales
 .env
