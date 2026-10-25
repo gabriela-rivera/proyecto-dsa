@@ -1,0 +1,17 @@
+# Datos gestionados mediante DVC
+data/
+
+# No subir archivos CSV directamente a GitHub
+*.csv
+
+# Credenciales y configuraciones locales
+.env
+.env.*
+!.env.example
+.aws/
+
+# Archivos temporales de Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
