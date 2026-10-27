@@ -1,7 +1,5 @@
-# Permitir versionar los datos anonimizados y los metadatos de DVC
-!/data/
-!/data/*.csv
-!/data/*.csv.dvc
+# Datos: se versionan con DVC (remoto en Google Drive).
+# En Git solo van los archivos .dvc; los CSV quedan ignorados por data/.gitignore.
 
 # Credenciales y configuraciones locales
 .env
@@ -15,3 +13,7 @@ __pycache__/
 .venv/
 venv/
 .DS_Store
+
+# Jupyter y MLflow
+.ipynb_checkpoints/
+mlruns/
