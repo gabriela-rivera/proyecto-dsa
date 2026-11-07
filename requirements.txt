@@ -6,3 +6,6 @@ cryptography<44
 # Procesamiento
 pandas
 numpy
+scikit-learn
+mlflow==3.18.0
+matplotlib
