@@ -173,7 +173,7 @@ def correr_modelo(nombre, run_name, estimador, params, train, test, base):
         mlflow.log_figure(_grafica(test, pred, run_name), "real_vs_predicho.png")
         plt.close("all")
         firma = infer_signature(Xtr, pipe.predict(Xtr))
-        mlflow.sklearn.log_model(pipe, name="model", signature=firma,
+        mlflow.sklearn.log_model(pipe, name="model", signature=firma, serialization_format="cloudpickle",
                                  input_example=Xtr.head(3))
         run_id = run.info.run_id
 
