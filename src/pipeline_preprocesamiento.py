@@ -5,7 +5,7 @@ Entrada : data/Daily Movement Report Anonimizado.csv   (un registro por viaje)
 Salidas : data/processed/viajes_limpios.csv          (un registro por viaje, limpio)
           data/processed/km_diario.csv               (un registro por vehículo y día, con variables para el modelo)
 
-Contrato con el equipo de modelos (km_diario.csv):
+Paso a  modelo (km_diario.csv):
     - Objetivos: km (km del día) y km_media_prox14 / km_media_prox28 (promedio de km/día de los próximos 14 / 28 días).
     - Variables: km_lag1, km_lag2, km_lag7, km_media7, km_media14, km_media28, km_std7,
                  km_media_dia_semana, dia_semana, fin_de_semana, mes, vehiculo.
