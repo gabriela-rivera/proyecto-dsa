@@ -9,3 +9,7 @@ numpy
 scikit-learn
 mlflow==3.18.0
 matplotlib
+
+# Tablero
+dash
+joblib
