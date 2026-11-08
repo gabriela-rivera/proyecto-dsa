@@ -1,0 +1,64 @@
+:root{
+  --fondo:#F3F6F2; --tinta:#1B2A22; --suave:#55635B; --verde:#1F4D3A; --verde-claro:#DDE8DF;
+  --borde:#D5DDD6; --aviso-fondo:#FFF4DD; --aviso-borde:#E0B04A; --aviso-texto:#5C3B00; --error:#9B1C1C;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);
+     font-family:"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+.pagina{max-width:1120px;margin:0 auto;padding:40px 24px 32px;display:flex;flex-direction:column;gap:24px}
+
+.encabezado{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:baseline;justify-content:space-between}
+.encabezado h1{margin:0;font-size:28px;font-weight:600;color:var(--verde)}
+.subtitulo{margin:0;font-size:14px;color:var(--suave)}
+
+.fila-superior{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between}
+.buscador{flex:1 1 380px;display:flex;flex-direction:column;gap:6px}
+.etiqueta{font-size:13px;font-weight:500;color:var(--suave)}
+.buscador-controles{display:flex;gap:12px}
+.campo{flex:1;height:48px;padding:0 16px;font-size:16px;font-family:inherit;color:var(--tinta);
+       background:#fff;border:2px solid var(--verde);border-radius:8px}
+.campo:focus,button:focus-visible{outline:3px solid #7FB89A;outline-offset:2px}
+.mensaje-error{min-height:18px;font-size:13px;color:var(--error)}
+
+button{font-family:inherit;cursor:pointer}
+.boton-secundario{height:48px;padding:0 24px;font-size:15px;font-weight:600;color:var(--verde);
+                  background:#fff;border:2px solid var(--verde);border-radius:8px}
+.boton-secundario:hover{background:#EEF4EF}
+.boton-principal{flex:1 1 auto;height:48px;padding:0 16px;font-size:15px;font-weight:600;color:#fff;
+                 background:var(--verde);border:2px solid var(--verde);border-radius:8px}
+.boton-principal:hover{background:#17392B}
+
+.panel-modelo{flex:1 1 440px;display:flex;flex-direction:column;gap:8px;padding:12px 14px 14px;
+              background:var(--verde-claro);border-radius:10px}
+.panel-titulo{font-size:13px;font-weight:600}
+.panel-controles{display:flex;gap:12px;align-items:stretch}
+.caja-fecha{flex:0 0 160px;height:48px;display:flex;flex-direction:column;align-items:center;
+            justify-content:center;background:#fff;border:2px solid var(--verde);border-radius:8px}
+.caja-etiqueta{font-size:11px;line-height:1.2;color:var(--suave)}
+.caja-valor{font-size:17px;line-height:1.2;font-weight:600;color:var(--verde)}
+
+.resultado-detalle:empty{display:none}
+.resultado-detalle{display:flex;flex-direction:column;gap:8px;padding:14px 16px;background:#fff;
+                   border:1px solid var(--borde);border-radius:10px}
+.resultado-detalle p{margin:0;font-size:15px}
+.texto-secundario{color:var(--suave)}
+.aviso{padding:8px 12px;font-size:14px;color:var(--aviso-texto);background:var(--aviso-fondo);
+       border-left:4px solid var(--aviso-borde);border-radius:4px}
+
+.seccion{background:#fff;border:2px solid var(--verde);border-radius:12px;padding:24px;
+         display:flex;flex-direction:column;gap:16px}
+.seccion h2{margin:0;font-size:18px;font-weight:600}
+.centrado{text-align:center}
+.seccion-cabecera{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;justify-content:space-between}
+.subtitulo-vehiculo{font-size:14px;color:var(--suave)}
+.tarjetas{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.tarjeta{display:flex;flex-direction:column;gap:4px;padding:14px 16px;background:var(--fondo);border-radius:8px}
+.tarjeta-titulo{font-size:13px;color:var(--suave)}
+.tarjeta-valor{font-size:24px;font-weight:600}
+
+.pie{font-size:12px;color:var(--suave);text-align:center}
+@media (max-width:600px){
+  .pagina{padding:24px 12px}
+  .panel-controles{flex-direction:column}
+  .caja-fecha{flex:0 0 auto;width:100%}
+}
