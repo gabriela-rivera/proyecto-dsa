@@ -1,0 +1,16 @@
+{
+  "version_datos": "ce34fbfc258e270aeff248a8ed7435ed",
+  "modelo": "Ridge(alpha=0.01)",
+  "objetivo": "km_media_prox28",
+  "n_entrenamiento_final": 530,
+  "fecha_corte_prueba": "2026-09-15",
+  "mae_global_km_dia": 12.41,
+  "mae_por_vehiculo_km_dia": {
+    "VH-01": 13.18,
+    "VH-02": 18.3,
+    "VH-03": 8.53,
+    "VH-04": 9.62
+  },
+  "scikit_learn": "1.9.1",
+  "fecha_max_datos": "2026-10-22"
+}

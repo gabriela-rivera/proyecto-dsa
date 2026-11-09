@@ -1,4 +1,4 @@
-# Predicción de la fecha del próximo mantenimiento preventivo en la flota 
+# Predicción de la fecha del próximo mantenimiento preventivo en la flota
 
 Proyecto del curso **Despliegue de Soluciones Analíticas (MIAD – Universidad de los Andes)**.
 
@@ -10,17 +10,20 @@ La solución final incluye un modelo supervisado, una API para servir las predic
 
 | Entrega | Contenido | Estado |
 |---|---|---|
-| 1 | Problema, pregunta de negocio, datos, exploración (EDA), maqueta | Entregada, pendiente de retroalimentación
-| 2 | Modelos, experimentos en MLflow, tablero | Pendiente
-| 3 | API, empaquetado y despliegue en Docker | Pendiente
+| 1 | Problema, pregunta de negocio, datos, exploración (EDA), maqueta | Entregada, pendiente de retroalimentación |
+| 2 | Preprocesamiento, modelos, experimentos en MLflow, tablero | En desarrollo |
+| 3 | API, empaquetado y despliegue en Docker | Pendiente |
 
 ## Estructura del repositorio
 
 ```
 ├── data/
-│   └── Daily Movement Report Anonimizado.csv.dvc   # metadatos DVC (el CSV está en el remoto)
+│   ├── Daily Movement Report Anonimizado.csv.dvc   # datos crudos (metadatos DVC)
+│   └── processed.dvc                               # datos procesados (metadatos DVC)
 ├── notebooks/
-│   └── EDA_Daily_Movement_Report.ipynb             # análisis exploratorio
+│   └── EDA Daily Movement Report.ipynb             # análisis exploratorio (Entrega 1)
+├── src/
+│   └── pipeline_preprocesamiento.py                # viajes GPS -> tabla km por vehículo-día
 ├── .dvc/config                                     # configuración del remoto DVC
 ├── requirements.txt
 └── README.md
@@ -34,32 +37,41 @@ La solución final incluye un modelo supervisado, una API para servir las predic
 
 ## Configuración del entorno
 
+Requiere **Python 3.11 o 3.12**. Las versiones más recientes (3.13+) aún no son compatibles con todas las dependencias.
+
 ```powershell
 git clone https://github.com/gabriela-rivera/proyecto-dsa.git
 cd proyecto-dsa
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1        # Windows
-# source .venv/bin/activate         # macOS / Linux
+python -m venv .venv                 # o: py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1         # Windows
+# source .venv/bin/activate          # macOS / Linux
 pip install -r requirements.txt
+```
+
+Si PowerShell bloquea la activación del entorno:
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 ```
 
 ## Obtener los datos (DVC + Google Drive)
 
-1. Pide al equipo que agregue tu cuenta de Google como **usuario de prueba** de la app y como **editor** de la carpeta de Drive.
-2. Configura el secreto del cliente OAuth. Lo entrega el equipo por un canal privado 
-   ```powershell
-   dvc remote modify --local gdrive gdrive_client_secret "SECRETO"
-   ```
-3. Descarga los datos:
-   ```powershell
-   dvc pull
-   ```
+Los datos están en un remoto de Google Drive. Para acceder, pide al equipo que agregue tu cuenta de Google y te comparta el secreto del cliente OAuth (por un canal privado; nunca se sube al repositorio).
 
-Para publicar una nueva versión de los datos:
 ```powershell
-dvc add "data/<archivo>.csv"
+dvc remote modify --local gdrive gdrive_client_secret "SECRETO"
+dvc pull
+```
+
+La primera vez se abre el navegador para autorizar el acceso. Si aparece el error `invalid_grant` (la autorización vence cada 7 días), borra la carpeta `pydrive2fs` del caché de tu usuario y repite `dvc pull`.
+
+Para publicar una nueva versión de los datos: `dvc add <ruta>`, `dvc push` y commit del archivo `.dvc`.
+
+## Preprocesamiento
+
+`src/pipeline_preprocesamiento.py` transforma los viajes del GPS en una tabla con un registro por vehículo y día (`data/processed/km_diario.csv`), que es la que usa el modelo. Las reglas de limpieza, las variables y los parámetros están documentados al inicio del script.
+
+```powershell
+python src/pipeline_preprocesamiento.py
+dvc add data/processed
 dvc push
-git add "data/<archivo>.csv.dvc"
-git commit -m "Actualizar datos"
-git push
 ```
