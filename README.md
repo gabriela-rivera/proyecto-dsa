@@ -6,34 +6,41 @@ Es un componente del proyecto de grado *"Predicción de fallas en flotas con Mac
 
 La solución final incluye un modelo supervisado, una API para servir las predicciones y un tablero, desplegados en contenedores Docker.
 
-## Estado del proyecto
+## Prototipo desplegado
 
-| Entrega | Contenido | Estado |
-|---|---|---|
-| 1 | Problema, pregunta de negocio, datos, exploración (EDA), maqueta | Entregada, pendiente de retroalimentación |
-| 2 | Preprocesamiento, modelos, experimentos en MLflow, tablero | En desarrollo |
-| 3 | API, empaquetado y despliegue en Docker | Pendiente |
+| Componente | Dirección |
+|---|---|
+| Tablero | http://3.18.4.17:8050 |
+| API (documentación interactiva) | http://3.18.4.17:8001/docs |
+
+La API y el tablero corren en contenedores Docker (`docker compose up -d --build`) en una instancia EC2 de AWS. El modelo en producción es un SVR (`svr_8`), registrado en MLflow.
+
+## Documentación
+
+- **Manual de usuario** del tablero: [PDF](docs/downloads/Manual_de_usuario.pdf) · [web](docs/web/manual_usuario.md)
+- **Manual de instalación** (tablero, API y modelo): [PDF](docs/downloads/Manual_de_instalacion.pdf) · [web](docs/web/manual_instalacion.md)
 
 ## Estructura del repositorio
 
 ```
-├── data/
-│   ├── Daily Movement Report Anonimizado.csv.dvc   # datos crudos (metadatos DVC)
-│   └── processed.dvc                               # datos procesados (metadatos DVC)
-├── notebooks/
-│   └── EDA Daily Movement Report.ipynb             # análisis exploratorio (Entrega 1)
+├── api/                  # API FastAPI: app/, pruebas, Dockerfile y artefactos/ (modelo final y datos anonimizados)
+├── tablero/              # tablero Dash que consulta la API, con su Dockerfile
+├── docker-compose.yml    # levanta la API (8001) y el tablero (8050)
 ├── src/
-│   └── pipeline_preprocesamiento.py                # viajes GPS -> tabla km por vehículo-día
-├── .dvc/config                                     # configuración del remoto DVC
-├── requirements.txt
-└── README.md
+│   ├── pipeline_anonimizar_reporte.py   # reporte GPS crudo -> reporte anonimizado
+│   ├── pipeline_preprocesamiento.py     # viajes -> tabla km por vehículo-día con contrato
+│   └── modelos_comunes.py               # variables, pipeline de sklearn y registro en MLflow
+├── notebooks/            # EDA y experimentos 01–07 (Ridge, Lasso, ElasticNet, RF, GB, XGBoost, SVR); 08 exporta el modelo
+├── data/                 # metadatos DVC de los datos (los datos están en el remoto)
+├── docs/                 # manuales (downloads/ en PDF, web/ en Markdown)
+└── requirements.txt
 ```
 
 ## Datos
 
-- **Fuente:** reporte diario de movimientos de la plataforma GPS del contrato piloto (5 camionetas, mayo–octubre de 2026, 9.589 viajes).
-- **Anonimización:** vehículos como `VH-01` a `VH-05` y conductores como `Conductor 01` a `Conductor 20`. Sin placas ni datos personales.
-- **Versionamiento:** los datos se gestionan con **DVC** y se almacenan en un remoto de **Google Drive**. En Git solo se versionan los archivos `.dvc`.
+- **Fuente:** reporte diario de movimientos de la plataforma de seguimiento GPS de la Compañía: 11 camionetas de dos contratos, diciembre de 2023 a noviembre de 2026 (184.741 viajes).
+- **Anonimización:** `src/pipeline_anonimizar_reporte.py` reemplaza placas por `VH-01`…`VH-11`, conductores por `Conductor NN` y ubicaciones por la letra del contrato. Las tablas de correspondencia quedan fuera del repositorio (`data/raw/`).
+- **Versionamiento:** DVC con remoto en **Amazon S3** (Google Drive como respaldo). Versiones etiquetadas en Git: `datos-v1` (Entrega 2) y `datos-v2` (Entrega 3).
 
 ## Configuración del entorno
 
@@ -53,16 +60,15 @@ Si PowerShell bloquea la activación del entorno:
 Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 ```
 
-## Obtener los datos (DVC + Google Drive)
+## Obtener los datos (DVC + S3)
 
-Los datos están en un remoto de Google Drive. Para acceder, pide al equipo que agregue tu cuenta de Google y te comparta el secreto del cliente OAuth (por un canal privado; nunca se sube al repositorio).
+El remoto de datos es privado. Cada integrante tiene llaves de acceso propias al bucket (se entregan por un canal privado; nunca se suben al repositorio):
 
 ```powershell
-dvc remote modify --local gdrive gdrive_client_secret "SECRETO"
+dvc remote modify --local s3 access_key_id 'ACCESS_KEY'
+dvc remote modify --local s3 secret_access_key 'SECRET_KEY'
 dvc pull
 ```
-
-La primera vez se abre el navegador para autorizar el acceso. Si aparece el error `invalid_grant` (la autorización vence cada 7 días), borra la carpeta `pydrive2fs` del caché de tu usuario y repite `dvc pull`.
 
 Para publicar una nueva versión de los datos: `dvc add <ruta>`, `dvc push` y commit del archivo `.dvc`.
 
