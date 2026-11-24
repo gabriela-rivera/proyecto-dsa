@@ -8,8 +8,10 @@ Salidas : data/processed/viajes_limpios.csv          (un registro por viaje, lim
 Paso a  modelo (km_diario.csv):
     - Objetivos: km (km del día) y km_media_prox14 / km_media_prox28 (promedio de km/día de los próximos 14 / 28 días).
     - Variables: km_lag1, km_lag2, km_lag7, km_media7, km_media14, km_media28, km_std7,
-                 km_media_dia_semana, dia_semana, fin_de_semana, mes, vehiculo.
+                 km_media_dia_semana, dia_semana, fin_de_semana, mes, vehiculo, contrato.
     - Filas: apta_modelo == True (y objetivo no vacío). Partición: columna 'particion' (train / test).
+    - contrato: contrato en el que operó el vehículo ese día (Contrato B, D, …), según la zona de sus viajes.
+      Los días de traslado entre contratos quedan como "Traslado" y no son aptos para el modelo.
 
 Uso (desde la raíz del repo):
     python src/pipeline_preprocesamiento.py
@@ -27,10 +29,11 @@ SALIDA = RAIZ / "data" / "processed"
 # Parámetros del preprocesamiento (documentados en el reporte)
 DIAS_HUECO_GPS = 7          # >= 7 días seguidos sin viajes se consideran falta de datos (GPS/indisponibilidad), no 0 km
 UMBRAL_SALTO_ODO_KM = 1.0   # diferencia entre odómetro final de un viaje e inicial del siguiente
-FECHA_CORTE_TEST = "2026-09-15"  # partición temporal: entrenamiento < corte <= prueba
+FECHA_CORTE_TEST = "2026-07-01"  # partición temporal: entrenamiento < corte <= prueba (datos v2: dic-2023 a nov-2026)
 VENTANAS = (7, 14, 28)
 REZAGOS = (1, 2, 7)
 HORIZONTES = (14, 28)       # objetivos km_media_prox14 y km_media_prox28
+ZONAS_NO_CONTRATO = ("Traslado", "Sin identificar")  # zonas que no corresponden a un contrato
 
 
 # --------------------------------------------------------------------------- viajes
@@ -62,8 +65,10 @@ def limpiar_viajes(df: pd.DataFrame) -> pd.DataFrame:
     df["vehiculo"] = df["AssetHostID"]
     df["conductor"] = df["AssetName2"]
     df["fecha"] = df["salida_dt"].dt.normalize()
+    # Zona del viaje (anonimizada en el reporte): contrato o traslado
+    df["zona"] = df["DepartFrom"].where(~df["DepartFrom"].isin(ZONAS_NO_CONTRATO), "Traslado")
 
-    cols = ["vehiculo", "conductor", "fecha", "salida_dt", "llegada_dt", "distancia_km", "odo_inicio", "odo_fin",
+    cols = ["vehiculo", "conductor", "fecha", "zona", "salida_dt", "llegada_dt", "distancia_km", "odo_inicio", "odo_fin",
             "min_conduccion", "min_detenido", "min_duracion", "vel_max_kmh", "vel_prom_kmh", "combustible_l"]
     df = df[cols].sort_values(["vehiculo", "salida_dt"]).reset_index(drop=True)
 
@@ -74,6 +79,15 @@ def limpiar_viajes(df: pd.DataFrame) -> pd.DataFrame:
 
 
 # --------------------------------------------------------------------------- diario
+def contrato_del_dia(v: pd.DataFrame) -> pd.DataFrame:
+    """Contrato del día = zona con más km recorridos ese día (con km 0, la zona con más viajes)."""
+    z = (v.groupby(["vehiculo", "fecha", "zona"])
+           .agg(km=("distancia_km", "sum"), n=("distancia_km", "size"))
+           .reset_index()
+           .sort_values(["vehiculo", "fecha", "km", "n"], ascending=[True, True, False, False]))
+    return z.drop_duplicates(["vehiculo", "fecha"])[["vehiculo", "fecha", "zona"]].rename(columns={"zona": "contrato"})
+
+
 def agregar_diario(v: pd.DataFrame) -> pd.DataFrame:
     """Un registro por vehículo y día calendario, incluidos los días sin viajes."""
     d = (v.groupby(["vehiculo", "fecha"])
@@ -82,7 +96,8 @@ def agregar_diario(v: pd.DataFrame) -> pd.DataFrame:
                 combustible_l=("combustible_l", "sum"), vel_max_kmh=("vel_max_kmh", "max"),
                 conductores=("conductor", "nunique"), odo_fin_dia=("odo_fin", "max"),
                 salto_odo_km=("salto_odo_km", lambda s: s.fillna(0).clip(lower=0).sum()))
-           .reset_index())
+           .reset_index()
+           .merge(contrato_del_dia(v), on=["vehiculo", "fecha"], how="left"))
 
     calendario = pd.date_range(v["fecha"].min(), v["fecha"].max(), freq="D")
     completo = []
@@ -103,6 +118,8 @@ def agregar_diario(v: pd.DataFrame) -> pd.DataFrame:
         for c in ["km", "viajes", "min_conduccion", "min_detenido", "combustible_l", "conductores", "salto_odo_km"]:
             s.loc[sin & ~faltante, c] = 0.0
         s["odo_fin_dia"] = s["odo_fin_dia"].ffill()
+        # Días sin viajes: el vehículo sigue en el último contrato observado (al inicio, el primero observado)
+        s["contrato"] = s["contrato"].ffill().bfill()
         completo.append(s.reset_index())
     return pd.concat(completo, ignore_index=True)
 
@@ -132,7 +149,8 @@ def crear_variables(d: pd.DataFrame) -> pd.DataFrame:
 
     d["particion"] = np.where(d["fecha"] < pd.Timestamp(FECHA_CORTE_TEST), "train", "test")
     # Filas utilizables por el modelo: con objetivo conocido y con historia suficiente
-    d["apta_modelo"] = (~d["dato_faltante"]) & d["km"].notna() & d[["km_lag1", "km_lag7", "km_media28"]].notna().all(axis=1)
+    d["apta_modelo"] = ((~d["dato_faltante"]) & d["km"].notna() & (d["contrato"] != "Traslado")
+                        & d[["km_lag1", "km_lag7", "km_media28"]].notna().all(axis=1))
     return d
 
 
@@ -155,6 +173,9 @@ def main(entrada: Path, salida: Path) -> None:
               f"test {int((ok & (diario['particion'] == 'test')).sum())}")
     print(diario.groupby("vehiculo").agg(dias=("fecha", "size"), faltantes=("dato_faltante", "sum"),
                                           km_dia=("km", "mean")).round(1).to_string())
+    print("\nDías por contrato (aptos para el modelo):")
+    print(pd.crosstab(diario.loc[diario["apta_modelo"], "contrato"],
+                      diario.loc[diario["apta_modelo"], "particion"]).to_string())
 
 
 if __name__ == "__main__":

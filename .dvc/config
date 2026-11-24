@@ -1,5 +1,8 @@
 [core]
-    remote = gdrive
+    remote = s3
 ['remote "gdrive"']
     url = gdrive://16LO3Ft8o0uXoushKrBTQRTQqvtYHmPXG
     gdrive_client_id = 378821062661-trspsujsq9oc11g8a6a22g4jnimg09ij.apps.googleusercontent.com
+['remote "s3"']
+    url = s3://miad-dsa-flota-dvc/dvc
+    region = us-east-2

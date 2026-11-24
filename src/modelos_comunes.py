@@ -26,11 +26,11 @@ RUTA_CSV = RAIZ / "data" / "processed" / "km_diario.csv"
 RUTA_DVC = RAIZ / "data" / "processed.dvc"
 
 # Se puede sobreescribir con la variable de entorno MLFLOW_TRACKING_URI
-TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://34.229.81.56:5000")
+TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://3.18.4.17:5000")
 EXPERIMENTO = "modelo_km_dia"
 OBJETIVO = "km_media_prox28"
 AUTOR = "Alejandro Acosta"
-FECHA_CORTE = "2026-09-15"
+FECHA_CORTE = "2026-07-01"
 
 # Supuesto para traducir error de km/dia a error de fecha (dias):
 # faltan KM_FALTANTES km para el proximo preventivo. Ajustar con el equipo.
@@ -41,12 +41,12 @@ NUMERICAS = [
     "km_media7", "km_media14", "km_media28", "km_std7", "km_media_dia_semana",
     "dia_semana", "fin_de_semana", "mes",
 ]
-CATEGORICAS = ["vehiculo"]
+CATEGORICAS = ["vehiculo", "contrato"]
 FEATURES = NUMERICAS + CATEGORICAS
 
 # Validacion temporal dentro del train (gap evita solapar ventanas del objetivo)
 CV_SPLITS = 3
-CV_GAP = 35  # ~7 dias * 5 vehiculos
+CV_GAP = 28 * 11  # 28 dias (horizonte del objetivo) * 11 vehiculos
 
 
 # ------------------------------- Datos ----------------------------------

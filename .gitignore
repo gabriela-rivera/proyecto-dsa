@@ -17,3 +17,6 @@ venv/
 # Jupyter y MLflow
 .ipynb_checkpoints/
 mlruns/
+
+# Datos crudos y correspondencias de anonimización (no se publican)
+data/raw/
