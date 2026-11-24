@@ -1,0 +1,5 @@
+tests/
+__pycache__/
+.pytest_cache/
+preparar_artefactos.py
+requirements-test.txt
