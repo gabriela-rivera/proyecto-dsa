@@ -1,42 +1,58 @@
-# Tablero de mantenimiento de flota (Dash)
+# Tablero de mantenimiento preventivo de flota
 
-Tablero que sigue la maqueta de la Entrega 1: buscar una placa, ver el detalle del vehículo, su historial de viajes y
-consultar al modelo la fecha estimada del próximo mantenimiento preventivo.
+Tablero en **Dash** que sigue la maqueta de la Entrega 1 y la amplía con la vista por contrato. No calcula nada:
+todos los datos y la estimación de la fecha salen de la **API** (`api/` en este repositorio).
 
-## Archivos
+## Qué muestra y de dónde sale cada parte
 
-| Archivo | Para qué sirve |
+| Parte del tablero | Endpoint de la API |
 |---|---|
-| `app.py` | Diseño del tablero y callbacks (punto de entrada; expone `server` para gunicorn) |
-| `modelo.py` | Carga el modelo y calcula la fecha estimada. Aquí se cambiará por una llamada a la API en la Entrega 3 |
-| `datos.py` | Lectura de los artefactos y consultas por vehículo |
-| `config.py` | Parámetros: contrato, intervalo de 5.000 km, variables del modelo, rutas |
-| `preparar_artefactos.py` | Genera `artefactos/` a partir de los datos de DVC y entrena el modelo final |
-| `assets/estilos.css` | Estilos |
-| `artefactos/` | Datos anonimizados ya procesados + modelo (`.joblib`) + metadatos. Es lo único que lee el tablero |
-| `requirements.txt` | Dependencias del tablero (las escribe `preparar_artefactos.py`) |
+| Selector de vista (Nacional / contrato) | `GET /contratos` |
+| Indicadores superiores | `GET /resumen?contrato=` |
+| Próximos preventivos (tabla de la flota) | `GET /flota?contrato=` |
+| Uso semanal | `GET /uso-semanal?contrato=&semanas=26` |
+| Buscador de placa + bloque sombreado "Consulta al modelo" | `POST /predict` |
+| Detalle del vehículo | `GET /flota` (datos del vehículo elegido) |
+| Uso reciente y proyección; historial | `GET /historial/{vehiculo}?dias=120` |
+| Pie de página (versión de datos y modelo) | `GET /health` |
 
-## Ejecutar en local (desde la raíz del repo)
+"Nacional" es llamar a los mismos endpoints sin el parámetro `contrato`.
+
+## Configuración
+
+| Variable de entorno | Valor por defecto | Para qué sirve |
+|---|---|---|
+| `API_URL` | `http://3.18.4.17:8001` | Dirección de la API. Si cambia la máquina, solo se cambia esta variable. |
+| `API_TIMEOUT` | `10` | Segundos de espera por cada respuesta de la API. |
+| `PORT` | `8050` | Puerto del tablero al ejecutarlo con `python app.py`. |
+
+## Ejecutar en local
+
+Desde la carpeta `tablero/`, con el entorno virtual activo:
 
 ```powershell
-dvc pull                                    # trae data/processed
-python tablero/preparar_artefactos.py       # genera tablero/artefactos y tablero/requirements.txt
-python tablero/app.py                       # abre http://127.0.0.1:8050
+pip install -r requirements.txt
+$env:API_URL = "http://3.18.4.17:8001"     # opcional si la API está en la dirección por defecto
+python app.py                              # http://127.0.0.1:8050
 ```
 
-## Cómo funciona la estimación
+Si la API está apagada o `API_URL` está mal, el tablero no se cae: muestra un aviso con el motivo.
 
-1. El modelo (Ridge, alpha = 0,01) pronostica los **km/día promedio de los próximos 28 días** del vehículo.
-2. Se calculan los **km que faltan** para el siguiente preventivo (intervalo de 5.000 km).
-3. `fecha estimada = último día con datos + km faltantes / km por día pronosticados`.
-4. El **rango probable** usa el error típico del modelo en prueba para ese vehículo.
+## Estructura
 
-Supuesto provisional: sin el consolidado de mantenimiento, se asume que el último preventivo fue en el múltiplo de 5.000 km
-más reciente. Cuando se tenga, se cargan los odómetros reales en `ODO_ULTIMO_PREVENTIVO` de `config.py`.
+```
+tablero/
+├── app.py            # diseño y callbacks
+├── api.py            # cliente de la API (una función por endpoint, errores legibles)
+├── config.py         # API_URL, tiempos, paleta
+├── assets/estilos.css
+└── requirements.txt
+```
 
-## Despliegue en Render
+## Alcance y limitaciones
 
-- Root Directory: `tablero`
-- Build Command: `pip install -r requirements.txt`
-- Start Command: `gunicorn app:server --bind 0.0.0.0:$PORT --workers 1 --timeout 120`
-- Variable de entorno: `PYTHON_VERSION` con la misma versión de Python con la que se generaron los artefactos
+- La tabla de historial muestra fecha, contrato (ubicación) y km por día. La maqueta incluía además viajes y
+  encargado, que la API no entrega.
+- La fecha estimada supone que el último preventivo se hizo en el múltiplo de 5.000 km más reciente, salvo que se
+  escriba el km real del último preventivo en la consulta.
+- Los vehículos sin GPS reciente (más de 7 días) se marcan como "Sin GPS" y no muestran fecha estimada en la tabla.
