@@ -1,5 +1,7 @@
-# Servicios del proyecto en la EC2. Uso, desde la raíz del repo:
+# Servicios del proyecto. Uso, desde la raíz del repo:
 #   docker compose up -d --build
+# API:      http://localhost:8001/docs
+# Tablero:  http://localhost:8050
 services:
   api:
     build: ./api
@@ -7,4 +9,17 @@ services:
     container_name: flota-api
     ports:
       - "8001:8001"
+    restart: always
+
+  tablero:
+    build: ./tablero
+    image: flota-tablero
+    container_name: flota-tablero
+    environment:
+      API_URL: http://api:8001      # dentro de la red de Docker se llama a la API por el nombre del servicio
+    ports:
+      - "8050:8050"
+    depends_on:
+      api:
+        condition: service_healthy
     restart: always
