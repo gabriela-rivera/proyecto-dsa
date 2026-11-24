@@ -20,3 +20,6 @@ mlruns/
 
 # Datos crudos y correspondencias de anonimización (no se publican)
 data/raw/
+
+# Caché de pruebas de la API
+.pytest_cache/
