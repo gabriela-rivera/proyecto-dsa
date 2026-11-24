@@ -1,0 +1,33 @@
+{
+  "modelo": "svr (svr_8)",
+  "origen": "MLflow run 0a718d0f35bf462eb5ba43de27190853",
+  "objetivo": "km_media_prox28",
+  "version_datos": "72d353ac4a7d5867e3637ea3cfea39c6",
+  "fecha_max_datos": "2026-11-21",
+  "mae_global": 15.38,
+  "mae_linea_base": 16.56,
+  "mejora_vs_linea_base_pct": 7.1,
+  "mae_por_vehiculo": {
+    "VH-01": 6.2,
+    "VH-02": 14.19,
+    "VH-03": 12.2,
+    "VH-04": 17.71,
+    "VH-05": 31.38,
+    "VH-06": 15.78,
+    "VH-07": 25.34,
+    "VH-08": 34.48,
+    "VH-09": 4.09,
+    "VH-10": 10.51,
+    "VH-11": 20.63
+  },
+  "n_train": 8906,
+  "n_test": 1138,
+  "python": "3.11.9",
+  "versiones": {
+    "scikit-learn": "1.9.1",
+    "pandas": "3.1.1",
+    "numpy": "2.4.6",
+    "joblib": "1.6.0"
+  },
+  "generado": "2026-11-23T22:32:45"
+}

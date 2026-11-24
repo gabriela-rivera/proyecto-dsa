@@ -1,4 +1,4 @@
-# Datos: se versionan con DVC (remoto en Google Drive).
+# Datos: se versionan con DVC (remoto en Amazon S3; Google Drive como respaldo).
 # En Git solo van los archivos .dvc; los CSV quedan ignorados por data/.gitignore.
 
 # Credenciales y configuraciones locales
@@ -20,3 +20,9 @@ mlruns/
 
 # Datos crudos y correspondencias de anonimización (no se publican)
 data/raw/
+
+# Caché de pruebas de la API
+.pytest_cache/
+
+# Exportación local del notebook 08 (el modelo desplegado está en api/artefactos/)
+modelo_final.joblib
