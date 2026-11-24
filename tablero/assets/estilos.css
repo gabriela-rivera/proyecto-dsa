@@ -1,64 +1,121 @@
 :root{
-  --fondo:#F3F6F2; --tinta:#1B2A22; --suave:#55635B; --verde:#1F4D3A; --verde-claro:#DDE8DF;
-  --borde:#D5DDD6; --aviso-fondo:#FFF4DD; --aviso-borde:#E0B04A; --aviso-texto:#5C3B00; --error:#9B1C1C;
+  --azul:#164479; --azul2:#2B79BA; --amarillo:#F8AA00; --rojo:#E7344C; --verde:#65B32E;
+  --fondo:#F2F5F9; --tinta:#1B2733; --suave:#55636F; --borde:#D5DDE6; --panel:#E4EDF7;
+  --rojo-texto:#A01B30; --amarillo-texto:#7A4F00; --verde-texto:#2F6B10;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--fondo);color:var(--tinta);
      font-family:"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
-.pagina{max-width:1120px;margin:0 auto;padding:40px 24px 32px;display:flex;flex-direction:column;gap:24px}
-
-.encabezado{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:baseline;justify-content:space-between}
-.encabezado h1{margin:0;font-size:28px;font-weight:600;color:var(--verde)}
-.subtitulo{margin:0;font-size:14px;color:var(--suave)}
-
-.fila-superior{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between}
-.buscador{flex:1 1 380px;display:flex;flex-direction:column;gap:6px}
-.etiqueta{font-size:13px;font-weight:500;color:var(--suave)}
-.buscador-controles{display:flex;gap:12px}
-.campo{flex:1;height:48px;padding:0 16px;font-size:16px;font-family:inherit;color:var(--tinta);
-       background:#fff;border:2px solid var(--verde);border-radius:8px}
-.campo:focus,button:focus-visible{outline:3px solid #7FB89A;outline-offset:2px}
-.mensaje-error{min-height:18px;font-size:13px;color:var(--error)}
-
 button{font-family:inherit;cursor:pointer}
-.boton-secundario{height:48px;padding:0 24px;font-size:15px;font-weight:600;color:var(--verde);
-                  background:#fff;border:2px solid var(--verde);border-radius:8px}
-.boton-secundario:hover{background:#EEF4EF}
-.boton-principal{flex:1 1 auto;height:48px;padding:0 16px;font-size:15px;font-weight:600;color:#fff;
-                 background:var(--verde);border:2px solid var(--verde);border-radius:8px}
-.boton-principal:hover{background:#17392B}
+button:focus-visible,input:focus-visible{outline:3px solid var(--azul2);outline-offset:2px}
 
-.panel-modelo{flex:1 1 440px;display:flex;flex-direction:column;gap:8px;padding:12px 14px 14px;
-              background:var(--verde-claro);border-radius:10px}
-.panel-titulo{font-size:13px;font-weight:600}
-.panel-controles{display:flex;gap:12px;align-items:stretch}
-.caja-fecha{flex:0 0 160px;height:48px;display:flex;flex-direction:column;align-items:center;
-            justify-content:center;background:#fff;border:2px solid var(--verde);border-radius:8px}
-.caja-etiqueta{font-size:11px;line-height:1.2;color:var(--suave)}
-.caja-valor{font-size:17px;line-height:1.2;font-weight:600;color:var(--verde)}
+.pagina{max-width:1180px;margin:0 auto;padding:0 20px 32px;display:flex;flex-direction:column;gap:20px}
 
-.resultado-detalle:empty{display:none}
-.resultado-detalle{display:flex;flex-direction:column;gap:8px;padding:14px 16px;background:#fff;
-                   border:1px solid var(--borde);border-radius:10px}
-.resultado-detalle p{margin:0;font-size:15px}
-.texto-secundario{color:var(--suave)}
-.aviso{padding:8px 12px;font-size:14px;color:var(--aviso-texto);background:var(--aviso-fondo);
-       border-left:4px solid var(--aviso-borde);border-radius:4px}
+/* ---- encabezado ---- */
+.encabezado{margin:0 -20px;padding:22px 20px;background:var(--azul);color:#fff;display:flex;flex-wrap:wrap;
+            gap:12px 24px;align-items:center;justify-content:space-between}
+.encabezado h1{margin:0;font-size:26px;font-weight:600}
+.subtitulo{margin:4px 0 0;font-size:14px;color:#C9D8EA}
+.selector-contrato{display:flex;align-items:center;gap:10px;min-width:280px}
+.selector-contrato .Select-control, .selector-contrato .dash-dropdown{min-width:240px}
+.etiqueta-clara{font-size:13px;color:#C9D8EA}
+.selector-contrato .dash-dropdown{color:var(--tinta);flex:1}
 
-.seccion{background:#fff;border:2px solid var(--verde);border-radius:12px;padding:24px;
-         display:flex;flex-direction:column;gap:16px}
-.seccion h2{margin:0;font-size:18px;font-weight:600}
-.centrado{text-align:center}
-.seccion-cabecera{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;justify-content:space-between}
-.subtitulo-vehiculo{font-size:14px;color:var(--suave)}
-.tarjetas{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
-.tarjeta{display:flex;flex-direction:column;gap:4px;padding:14px 16px;background:var(--fondo);border-radius:8px}
+/* ---- indicadores ---- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.tarjeta{display:flex;flex-direction:column;gap:2px;padding:14px 16px;background:#fff;border:1px solid var(--borde);
+         border-radius:10px}
 .tarjeta-titulo{font-size:13px;color:var(--suave)}
-.tarjeta-valor{font-size:24px;font-weight:600}
+.tarjeta-valor{font-size:26px;font-weight:600;color:var(--azul)}
+.tarjeta-valor.rojo{color:var(--rojo-texto)}
+.tarjeta-valor.amarillo{color:var(--amarillo-texto)}
+.tarjeta-sub{font-size:12px;color:var(--suave);min-height:15px}
 
-.pie{font-size:12px;color:var(--suave);text-align:center}
-@media (max-width:600px){
-  .pagina{padding:24px 12px}
-  .panel-controles{flex-direction:column}
-  .caja-fecha{flex:0 0 auto;width:100%}
+/* ---- secciones ---- */
+.seccion{background:#fff;border:1px solid var(--borde);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:14px;
+         min-width:0}
+.seccion h2{margin:0;font-size:17px;font-weight:600;color:var(--azul)}
+.seccion-cabecera{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between}
+.centrado{text-align:center}
+.texto-suave{margin:0;font-size:13px;color:var(--suave)}
+.chip{font-family:ui-monospace,Consolas,monospace;font-size:11px;color:var(--azul);background:#DCE8F5;padding:2px 8px;
+      border-radius:999px;white-space:nowrap}
+
+/* ---- tabla de la flota ---- */
+.tabla-contenedor{overflow-x:auto}
+.tabla-flota{width:100%;border-collapse:collapse;font-size:14px}
+.tabla-flota th{padding:6px 8px;text-align:left;font-weight:600;font-size:12px;color:var(--suave);
+                border-bottom:2px solid var(--azul);white-space:nowrap}
+.tabla-flota td{padding:7px 8px;border-bottom:1px solid #E6EBF1;white-space:nowrap}
+.tabla-flota .der{text-align:right;font-variant-numeric:tabular-nums}
+.tabla-flota tr.seleccionada td{background:#EAF2FB}
+.tabla-flota tr.apagada td{color:var(--suave)}
+.fila-boton{background:none;border:none;padding:0;font-size:14px;font-weight:700;color:var(--azul);
+            text-decoration:underline;text-underline-offset:3px}
+.fila-boton:hover{color:var(--azul2)}
+
+/* ---- alertas (color + texto, nunca solo color) ---- */
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.pill-mas_14_dias{background:#E3F2D6;color:var(--verde-texto)}
+.pill-8_14_dias{background:#FDEFC8;color:var(--amarillo-texto)}
+.pill-0_7_dias,.pill-vencido{background:#FADBE0;color:var(--rojo-texto)}
+.pill-sin_datos{background:#E6E9ED;color:#4A5560}
+
+/* ---- maqueta E1: buscador + consulta ---- */
+.etiqueta{font-size:13px;font-weight:600;color:var(--suave)}
+.panel-modelo{display:flex;flex-direction:column;gap:12px;padding:16px;background:var(--panel);
+              border-radius:12px;border:1px solid #C5D6EA}
+.panel-titulo{font-size:15px;font-weight:600;color:var(--azul)}
+.boton-principal{width:100%;min-height:52px;padding:0 16px;font-size:15px;font-weight:600;color:#fff;background:var(--azul);
+                 border:2px solid var(--azul);border-radius:8px}
+.boton-principal:hover{background:#0F3159}
+.caja-etiqueta{font-size:11px;line-height:1.2;color:var(--suave)}
+.caja-valor{font-size:18px;line-height:1.2;font-weight:700;color:var(--azul)}
+.campo-km{height:40px;padding:0 12px;font-size:14px;font-family:inherit;color:var(--tinta);background:#fff;
+          border:1px solid #9DB6D3;border-radius:8px;width:100%}
+.resultado-consulta:empty{display:none}
+.resultado-consulta{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.resultado-consulta p{margin:0}
+.mensaje-error{font-size:14px;color:var(--rojo-texto);font-weight:600}
+.aviso{padding:8px 12px;font-size:13px;color:var(--amarillo-texto);background:#FFF4D6;border-left:4px solid var(--amarillo);
+       border-radius:4px;margin:0}
+.banner-error{padding:12px 16px;font-size:14px;color:var(--rojo-texto);background:#FDE8EB;border:1px solid var(--rojo);
+              border-radius:8px}
+
+.tarjetas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.seccion .tarjeta{background:var(--fondo);border:none}
+
+.pie{font-size:12px;color:var(--suave);text-align:center;padding-top:4px}
+
+
+/* ---- fila principal: flota (izquierda) + consulta al modelo (derecha) ---- */
+.fila-principal{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px;align-items:start}
+.fila-inferior{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+.controles-consulta{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.campo-con-etiqueta{display:flex;flex-direction:column;gap:5px;min-width:0}
+.campo-km{height:38px}
+.cajas-resultado{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.caja-resultado{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:10px 6px;
+                background:#fff;border:1px solid #C5D6EA;border-radius:8px;text-align:center}
+.caja-resultado .caja-valor{font-size:18px}
+.caja-resultado .caja-valor.grande{font-size:20px}
+.fila-rango{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.texto-fuerte{font-size:14px;font-weight:600;color:var(--azul)}
+.sub-bloque{display:flex;flex-direction:column;gap:8px;padding:12px;background:#fff;border:1px solid #C5D6EA;border-radius:10px}
+.sub-bloque h3{margin:0;font-size:15px;font-weight:600;color:var(--azul)}
+
+@media (max-width:900px){
+  .fila-principal,.fila-inferior{grid-template-columns:minmax(0,1fr)}
+  .selector-contrato{min-width:0;width:100%}
+  .tarjetas{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:520px){
+  .tarjetas{grid-template-columns:minmax(0,1fr)}
+  .controles-consulta{grid-template-columns:minmax(0,1fr)}
+  .cajas-resultado{grid-template-columns:minmax(0,1fr)}
+}
+
+@media (max-width:1100px){
+  .tabla-flota{font-size:13px}
+  .tabla-flota th,.tabla-flota td{padding-left:6px;padding-right:6px}
 }
