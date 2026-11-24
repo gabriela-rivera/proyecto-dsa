@@ -1,43 +1,23 @@
-"""Configuración central del tablero de mantenimiento de flota."""
-from pathlib import Path
+"""Configuración del tablero de mantenimiento preventivo de flota.
 
-BASE = Path(__file__).resolve().parent      # .../tablero
-RAIZ = BASE.parent                          # raíz del repositorio
+El tablero no calcula nada: todos los datos y la estimación salen de la API (ver api/ en este repositorio).
+La dirección de la API se define con la variable de entorno API_URL, así no hay que tocar el código
+cuando cambia la máquina donde corre (EC2, Docker local, etc.).
+"""
+import os
 
-# ---- Artefactos que usa el tablero en ejecución (van en Git; ya anonimizados) ----
-ARTEFACTOS = BASE / "artefactos"
-RUTA_PANEL = ARTEFACTOS / "panel_diario.csv"
-RUTA_HISTORIAL = ARTEFACTOS / "historial_diario.csv"
-RUTA_MODELO = ARTEFACTOS / "modelo_ridge.joblib"
-RUTA_META = ARTEFACTOS / "metadatos.json"
+# ---- API -----------------------------------------------------------------------------------------
+API_URL = os.getenv("API_URL", "http://3.18.4.17:8001").rstrip("/")
+API_TIMEOUT = float(os.getenv("API_TIMEOUT", "10"))      # segundos de espera por respuesta
 
-# ---- Entradas versionadas con DVC (solo las usa preparar_artefactos.py) ----
-RUTA_KM_DIARIO = RAIZ / "data" / "processed" / "km_diario.csv"
-RUTA_VIAJES = RAIZ / "data" / "processed" / "viajes_limpios.csv"
-RUTA_PROCESSED_DVC = RAIZ / "data" / "processed.dvc"
+# ---- Consultas -----------------------------------------------------------------------------------
+DIAS_HISTORIAL = 120      # días que se piden a /historial (gráfica y tabla)
+SEMANAS_USO = 26          # semanas que se piden a /uso-semanal
+MAX_DIAS_PROYECCION = 60  # tope de días que se dibujan de la proyección en la gráfica
 
-# ---- Contexto (anonimizado según la tabla de anonimización del equipo) ----
-CONTRATO = "Contrato D"            # confirmar con el equipo
-REGION = "Llanos Orientales"
-DESCRIPCION_VEHICULO = "Nissan Frontier 2024"
-
-# ---- Reglas de negocio ----
-INTERVALO_KM = 5000                # un preventivo cada 5.000 km (guías del proyecto)
-# Odómetro del último preventivo de cada vehículo, cuando se tenga el consolidado de mantenimiento.
-# Ejemplo: {"VH-01": 45000.0}. Si un vehículo no está aquí, se asume que el último preventivo fue en el
-# múltiplo de INTERVALO_KM más reciente (supuesto provisional que se muestra en el tablero).
-ODO_ULTIMO_PREVENTIVO: dict[str, float] = {}
-UMBRAL_USO_BAJO_KM_DIA = 50        # por debajo de esto se avisa que la estimación es menos confiable
-DIAS_MAX_SIN_DATOS = 7             # más días sin datos que esto -> aviso de datos desactualizados
-MAX_DIAS_RANGO = 365               # tope para el extremo superior del rango de fechas
-
-# ---- Modelo (debe coincidir con src/modelos_comunes.py) ----
-OBJETIVO = "km_media_prox28"       # km/día promedio de los próximos 28 días
-NUMERICAS = [
-    "km_lag1", "km_lag2", "km_lag7",
-    "km_media7", "km_media14", "km_media28", "km_std7", "km_media_dia_semana",
-    "dia_semana", "fin_de_semana", "mes",
-]
-CATEGORICAS = ["vehiculo"]
-FEATURES = NUMERICAS + CATEGORICAS
-ALPHA = 0.01                       # Ridge con el menor CV MAE en MLflow (ridge_alpha_0.01)
+# ---- Paleta (la del equipo) ----------------------------------------------------------------------
+AZUL_PRIMARIO = "#164479"
+AZUL_SECUNDARIO = "#2B79BA"
+AMARILLO = "#F8AA00"
+ROJO = "#E7344C"
+VERDE = "#65B32E"
