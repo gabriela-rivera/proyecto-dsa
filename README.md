@@ -72,12 +72,24 @@ dvc pull
 
 Para publicar una nueva versión de los datos: `dvc add <ruta>`, `dvc push` y commit del archivo `.dvc`.
 
-## Preprocesamiento
+## Flujo de trabajo
 
-`src/pipeline_preprocesamiento.py` transforma los viajes del GPS en una tabla con un registro por vehículo y día (`data/processed/km_diario.csv`), que es la que usa el modelo. Las reglas de limpieza, las variables y los parámetros están documentados al inicio del script.
+| Paso | Qué se hace | Dónde |
+|---|---|---|
+| 1. Anonimización | Reporte GPS crudo → reporte anonimizado (versionado con DVC) | `src/pipeline_anonimizar_reporte.py` |
+| 2. Preprocesamiento | Viajes → tabla de km por vehículo y día, con contrato y variables del modelo | `src/pipeline_preprocesamiento.py` |
+| 3. Exploración | Análisis de los datos v1 (Entrega 1) y comparación con los datos v2 | `notebooks/EDA*.ipynb` |
+| 4. Modelos | Línea base, Ridge, Lasso, ElasticNet, Random Forest, Gradient Boosting, XGBoost y SVR, registrados en MLflow | `notebooks/01` a `07` |
+| 5. Modelo final | Se escoge por validación cruzada (`svr_8`) y se exporta a la API desde MLflow | `api/preparar_artefactos.py --run-id <RUN_ID>` |
+| 6. Despliegue | API y tablero en contenedores Docker | `docker compose up -d --build` |
 
 ```powershell
+python src/pipeline_anonimizar_reporte.py      # requiere los archivos privados de data/raw/
 python src/pipeline_preprocesamiento.py
-dvc add data/processed
+dvc add "data/Daily Movement Report Anonimizado.csv" data/processed
 dvc push
 ```
+
+Los experimentos se registran en un servidor MLflow con autenticación (variables `MLFLOW_TRACKING_URI`, `MLFLOW_TRACKING_USERNAME` y `MLFLOW_TRACKING_PASSWORD`). La configuración común de los modelos está en `src/modelos_comunes.py`.
+
+La instalación de la API y el tablero, en la nube o en local, está en el [manual de instalación](docs/web/manual_instalacion.md).
